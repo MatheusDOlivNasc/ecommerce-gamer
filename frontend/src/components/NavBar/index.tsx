@@ -42,7 +42,6 @@ const NavBar: React.FC<Props> = ({
                   <p>{cart?.getTotal() || ""}</p>
                 </div>
                 <Icon>shopping_cart</Icon>
-                {show === true ? "true" : "false"}
               </button>
             </div>
             <div
@@ -98,8 +97,11 @@ const NavBar: React.FC<Props> = ({
                                           <p className="text-gray-500">Qntt. 1</p>
 
                                           <div className="flex">
-                                            <button type="button" className="font-medium text-gray-700 hover:text-purple-600">
-                                              Remove
+                                            <button
+                                              type="button"
+                                              className="font-medium text-gray-700 hover:text-purple-600"
+                                              onClick={() => handleRemoveItem(prod.getId())}>
+                                              Remover
                                             </button>
                                           </div>
                                         </div>
