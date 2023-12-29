@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS cart (
+    id TEXT PRIMARY KEY NOT NULL,
+    owner TEXT NOT NULL,
+    createAt INTEGER NOT NULL
+);

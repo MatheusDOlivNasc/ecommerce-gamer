@@ -11,33 +11,32 @@ const Home: React.FC = () => {
   const [cart, setCart] = useState<Cart | null>(null);
 
   useEffect(() => {
-    const prodList: ProductModel[] = [
-      {
-        id: "4a6s4d5", name: "Fone Gamer", img: "/fones_1_1.jpg",
-        price: 20000, promo: 12500
-      },
-      {
-        id: "5a667d5", name: "Kit Gamer", img: "/kit.jpg",
-        price: 30000, promo: 20000
-      },
-      {
-        id: "4a61415", name: "Notebook Gamer", img: "/notebook_1.jpg",
-        price: 150000
-      }
-    ];
-
-    const prods = prodList.map(p => new Product(p));
-    const cart = new Cart({
-      id: "strijt",
-      owner: "ausdiahsdi",
-      createAt: Date.now(),
-      products: []
-    });
-
-    setCart(cart);
-    setProd(prods);
+    getData()
   }, [])
 
+  async function getData() {
+    try {
+      const prodList = await (
+        await fetch("http://localhost:8080/products", {
+          method: 'GET',
+          headers: { 'content-type': 'application/json' }
+        })
+      ).json() as ProductModel[];
+      
+      const prods = prodList.map(p => new Product(p));
+      const cart = new Cart({
+        id: "strijt",
+        owner: "ausdiahsdi",
+        createAt: Date.now(),
+        products: []
+      });
+  
+      setCart(cart);
+      setProd(prods);  
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div id="home" className="flex flex-col min-h-dvh">
