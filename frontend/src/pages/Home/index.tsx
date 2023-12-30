@@ -16,6 +16,25 @@ const Home: React.FC = () => {
 
   async function getData() {
     try {
+      /* 
+        {
+          "name": "Notebook Gamer",
+          "img": "/notebook_1.jpg",
+          "price": 150000
+        }
+        {
+          "name": "Kit Gamer",
+          "img": "/kit.jpg",
+          "price": 50000,
+          "promo": 30000
+        }
+        {
+          "name": "Fone Gamer",
+          "img": "/fones_1_1.jpg",
+          "price": 30000,
+          "promo": 15000
+        }
+       */
       const prodList = await (
         await fetch("http://localhost:8080/products", {
           method: 'GET',

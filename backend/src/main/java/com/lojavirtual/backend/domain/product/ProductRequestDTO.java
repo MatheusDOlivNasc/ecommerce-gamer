@@ -1,4 +1,11 @@
 package com.lojavirtual.backend.domain.product;
 
-public record ProductRequestDTO(String name, String img, Integer price, Integer promo) {
-}
+import lombok.NonNull;
+
+public record ProductRequestDTO(
+        String id,
+        @NonNull String name,
+        String img,
+        @NonNull Integer price,
+        Integer promo
+) {}

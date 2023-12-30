@@ -4,7 +4,10 @@ import com.lojavirtual.backend.domain.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "cart")
 @Entity(name = "cart")
@@ -18,13 +21,28 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String owner;
-    private String createAt;
+    private Timestamp createAt;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "prodInCart", joinColumns = {
-        @JoinColumn(name = "card_id", referencedColumnName = "id")
-    }, inverseJoinColumns = {
-        @JoinColumn(name = "prod_id", referencedColumnName = "id")
-    })
-    private Set<Product> products;
+    @JoinTable(
+        name = "prods_in_cart",
+        joinColumns = @JoinColumn(name = "cart_id"),
+        inverseJoinColumns = @JoinColumn(name = "prod_id")
+    )
+    private List<Product> products;
+
+    public Cart(CartRequestDTO data, List<Product> products) {
+        this.owner = data.owner();
+        this.createAt = new Timestamp(data.createAt());
+        this.products = products;
+    }
+
+    public CartResponseDTO toData() {
+        return new CartResponseDTO(
+            this.getId(),
+            this.getOwner(),
+            this.getCreateAt().getTime(),
+            this.getProducts()
+        );
+    }
 }

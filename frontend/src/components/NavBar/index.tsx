@@ -18,6 +18,23 @@ const NavBar: React.FC<Props> = ({
     cart.removeProduct(id);
     reload(cart);
   }
+  async function handleFinish() {
+    try {
+      if (!cart) return;
+      console.log(cart.toData())
+      const req = await fetch("http://localhost:8080/cart", {
+        method: "POST",
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(cart.toData())
+      })
+
+      if(req.ok !== true) throw await req.json();
+
+      console.log("deu")
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <header className={`flex flex-row h-16 bg-black px-5`}>
       <Link to="/" id="logo" className="grow flex items-center">
@@ -55,8 +72,8 @@ const NavBar: React.FC<Props> = ({
                 <div className="absolute inset-0 overflow-hidden">
                   <div className={`pointer-events-none fixed inset-y-0 ${!show && "right-100" || "right-0" } flex max-w-full pl-10`}>
                     <div className="pointer-events-auto w-screen max-w-md">
-                      <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-                        <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                      <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
+                        <div className="flex-1 px-4 py-6 sm:px-6">
                           <div className="flex items-start justify-between">
                             <h2 className="text-lg font-medium text-gray-900" id="slide-over-title">Carrinho</h2>
                             <div className="ml-3 flex h-7 items-center">
@@ -123,11 +140,12 @@ const NavBar: React.FC<Props> = ({
                             Frete e taxas serão calculadas no pagamento.
                           </p>
                           <div className="mt-6">
-                            <a 
-                              href="#"
-                              className="flex items-center justify-center rounded-md border border-transparent bg-purple-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-purple-700">
+                            <button 
+                              type="button"
+                              onClick={handleFinish}
+                              className="flex items-center w-full justify-center rounded-md border border-transparent bg-purple-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-purple-700">
                               Finalizar compra
-                            </a>
+                            </button>
                           </div>
                           <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                             <p>
@@ -147,67 +165,6 @@ const NavBar: React.FC<Props> = ({
                 </div>
               </div>
             </div>
-            {/* <div
-              className={
-                `absolute right-0 z-10 w-56 origin-top-right bg-white shadow-lg
-                ring-1 ring-black ring-opacity-5 focus:outline-none  group-hover/cart:block
-                hover:block rounded-b-xl hidden`
-              }
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="menu-button"
-              tabIndex={-1}>
-              <ul className="pb-2 pt-1 px-2" role="none">
-                {
-                  cart?.getProducts()?.map(p => (
-                    <li
-                      key={p.getId()}
-                      className={
-                        `text-gray-700 px-0 py-1 text-sm
-                        flex flex-row justify-center items-center`
-                      }
-                      role="cartitem"
-                      tabIndex={-1}
-                      id="menu-item-2">
-                      <div className="w-12 h-12 overflow-hidden flex justify-center items-center rounded">
-                        <img
-                          className="min-w-full min-h-full"
-                          src={p.getImg()}
-                          alt={p.getName()}
-                        />
-                      </div>
-                      <div className="grow px-2">
-                        <p className="text-ellipsis truncate">
-                          {p.getName()}
-                        </p>
-                        <p>
-                          {p.getValueCurrency()}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        className="h-12 w-7 text-gray-700 hover:text-purple-700 transition-all ease-in-out delay-150 flex justify-center items-center rounded"
-                        onClick={() => handleRemoveItem(p.getId())}>
-                        <Icon>delete</Icon>
-                      </button>
-                    </li>
-                  ))
-                }
-                {
-                  cart?.getProducts().length === 0 && (
-                    <li className="text-black text-sm">
-                      Nenhum item selecionado
-                    </li>
-                  )
-                }
-                <Button
-                  type="button"
-                  disabled={!cart || cart.getProducts().length === 0}
-                  className="w-full mt-1">
-                  Finalizar compra
-                </Button>
-              </ul>
-            </div> */}
           </li>
         </ul>
       </nav>
