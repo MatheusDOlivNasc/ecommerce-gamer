@@ -1,12 +1,11 @@
 package com.lojavirtual.backend.controller;
 
 import com.lojavirtual.backend.domain.cart.Cart;
-import com.lojavirtual.backend.domain.cart.CartRepository;
+import com.lojavirtual.backend.repositories.CartRepository;
 import com.lojavirtual.backend.domain.cart.CartRequestDTO;
 import com.lojavirtual.backend.domain.cart.CartResponseDTO;
 import com.lojavirtual.backend.domain.product.Product;
-import com.lojavirtual.backend.domain.product.ProductRepository;
-import lombok.NonNull;
+import com.lojavirtual.backend.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,7 @@ public class CartController {
         return ResponseEntity.ok(cart.toData());
     }
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/byId/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<CartResponseDTO> getCartById(@PathVariable String id) {
         Cart cart = repo.findTopById(id);
         return ResponseEntity.ok(cart.toData());

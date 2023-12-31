@@ -1,7 +1,7 @@
 package com.lojavirtual.backend.controller;
 
 import com.lojavirtual.backend.domain.product.Product;
-import com.lojavirtual.backend.domain.product.ProductRepository;
+import com.lojavirtual.backend.repositories.ProductRepository;
 import com.lojavirtual.backend.domain.product.ProductRequestDTO;
 import com.lojavirtual.backend.domain.product.ProductResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
-package com.lojavirtual.backend.domain.product;
+package com.lojavirtual.backend.repositories;
 
+import com.lojavirtual.backend.domain.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

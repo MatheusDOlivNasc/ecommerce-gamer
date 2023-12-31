@@ -13,6 +13,8 @@ const NavBar: React.FC<Props> = ({
   cart, reload
 }) => {
   const [show, setShow] = useState(false);
+  const [on, setOn] = useState(false);
+
   function handleRemoveItem(id: string) {
     if (!cart) return;
     cart.removeProduct(id);
@@ -35,6 +37,25 @@ const NavBar: React.FC<Props> = ({
       console.log(error)
     }
   }
+  function updateShow() {
+    let r = !show;
+    const time = 300;
+    
+    if(r === true) {
+      setOn(r);
+      setTimeout(() => {
+        
+        setShow(r);
+      }, time)
+    } else {
+      setShow(r);
+      setTimeout(() => {
+        setOn(r);
+      }, time)
+    }
+    
+  }
+
   return (
     <header className={`flex flex-row h-16 bg-black px-5`}>
       <Link to="/" id="logo" className="grow flex items-center">
@@ -51,7 +72,7 @@ const NavBar: React.FC<Props> = ({
                 type="button"
                 className="flex w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out delay-150 cursor-pointer"
                 id="menu-button"
-                onClick={() => setShow(true)}
+                onClick={updateShow}
                 aria-expanded="true"
                 aria-haspopup="true">
                 <div className="text-right pr-2">
@@ -62,22 +83,29 @@ const NavBar: React.FC<Props> = ({
               </button>
             </div>
             <div
-              className={`relative z-10 transition-all delay-1000 ` + (!show && "hidden" || "block")}
+              className={`relative z-10 ` + (!on && "hidden" || "block")}
               aria-labelledby="slide-over-title"
               role="dialog"
-              aria-modal={show === true ? "true" : "false"}>
-              <div className={`fixed inset-0 bg-purple-100 ${!show && " hidden" || "" } ${show ? "bg-opacity-75" : "bg-opacity-0"} transition ease-in-out delay-100`}></div>
+              aria-modal={`${show}`}>
+              <div
+                className={
+                  `fixed inset-0 bg-purple-50
+                  ${show ? "bg-opacity-75" : "bg-opacity-0"} transition ease-in-out delay-100`}
+                  />
 
               <div className="fixed inset-0 overflow-hidden">
-                <div className="absolute inset-0 overflow-hidden">
-                  <div className={`pointer-events-none fixed inset-y-0 ${!show && "right-100" || "right-0" } flex max-w-full pl-10`}>
+                <div className="absolute inset-0 overflow-hidden" >
+                  <div className={
+                      `pointer-events-none fixed inset-y-0 flex max-w-full pl-10
+                      transition-right ease-in-out duration-500 ${show && "right-0" || "right-100" }`
+                    }>
                     <div className="pointer-events-auto w-screen max-w-md">
                       <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
                         <div className="flex-1 px-4 py-6 sm:px-6">
                           <div className="flex items-start justify-between">
                             <h2 className="text-lg font-medium text-gray-900" id="slide-over-title">Carrinho</h2>
                             <div className="ml-3 flex h-7 items-center">
-                              <button type="button" onClick={() => setShow(!show)} className="relative -m-2 p-2 text-gray-400 hover:text-gray-500">
+                              <button type="button" onClick={updateShow} className="relative -m-2 p-2 text-gray-400 hover:text-gray-500">
                                 <span className="absolute -inset-0.5"></span>
                                 <span className="sr-only">Fechar painel</span>
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
@@ -151,7 +179,7 @@ const NavBar: React.FC<Props> = ({
                             <p>
                               ou <button
                                 type="button"
-                                onClick={() => setShow(false)}
+                                onClick={updateShow}
                                 className="font-medium text-green-600 hover:text-green-500">
                                 Continue comprando
                                 <span aria-hidden="true"> &rarr;</span>

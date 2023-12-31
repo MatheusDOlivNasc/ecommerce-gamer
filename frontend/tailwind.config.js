@@ -37,6 +37,9 @@ module.exports = {
         '100': '-100%',
       }
     },
+    transitionProperty: {
+      'right': 'right'
+    }
   },
   variants: {
     extend: {
