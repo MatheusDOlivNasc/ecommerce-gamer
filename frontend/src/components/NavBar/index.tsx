@@ -39,7 +39,7 @@ const NavBar: React.FC<Props> = ({
   }
   function updateShow() {
     let r = !show;
-    const time = 300;
+    const time = 100;
     
     if(r === true) {
       setOn(r);
@@ -63,8 +63,15 @@ const NavBar: React.FC<Props> = ({
       </Link>
       <nav className="flex-none">
         <ul className="flex flex-center h-full text-white">
-          <li className="justify-center items-center px-2 hidden sm:flex max-w-52 h-full">
-            <p className="cursor-default text-ellipsis truncate">Olá, Matheus Nascimento</p>
+          <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
+            <Link
+              className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
+              to="/auth/login">Entrar</Link>
+          </li>
+          <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
+            <Link
+              className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
+              to="/auth/register">Registrar</Link>
           </li>
           <li className="relative inline-block text-left group/cart">
             <div className="flex justify-center align-middle h-full ">
@@ -89,12 +96,18 @@ const NavBar: React.FC<Props> = ({
               aria-modal={`${show}`}>
               <div
                 className={
-                  `fixed inset-0 bg-purple-50
-                  ${show ? "bg-opacity-75" : "bg-opacity-0"} transition ease-in-out delay-100`}
+                  `fixed inset-0 bg-gray-700
+                  ${show ? "bg-opacity-70" : "bg-opacity-0"} transition ease-in-out delay-100`}
                   />
 
               <div className="fixed inset-0 overflow-hidden">
-                <div className="absolute inset-0 overflow-hidden" >
+                <div
+                  id="screen"
+                  onClick={s => {
+                    const c = s.target as HTMLDivElement;
+                    if(c.id === "screen") updateShow();
+                  }}
+                  className="absolute inset-0 overflow-hidden" >
                   <div className={
                       `pointer-events-none fixed inset-y-0 flex max-w-full pl-10
                       transition-right ease-in-out duration-500 ${show && "right-0" || "right-100" }`

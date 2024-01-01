@@ -4,6 +4,7 @@ import Slider from "../../components/Slider";
 import Footer from "../../components/Footer";
 import { Product, ProductModel } from "../../models/product.model";
 import { Cart } from "../../models/cart.models";
+import { Outlet } from "react-router-dom";
 
 
 const Home: React.FC = () => {
@@ -69,6 +70,7 @@ const Home: React.FC = () => {
         reload={(cart) => setCart(new Cart(cart.toData()))}
         />
       <Footer />
+      <Outlet />
     </div>
   );
 }

@@ -23,6 +23,7 @@ module.exports = {
         purple: colors.violet,
         white: colors.white,
         black: colors.black,
+        red: colors.red,
       },
       fontName: {
         sans: ["Inter Var", ...defaultTheme.fontFamily.sans],
