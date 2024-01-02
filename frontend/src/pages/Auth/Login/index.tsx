@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Button from "../../../components/Button";
 import { Link } from "react-router-dom";
 import Icon from "../../../components/Icon";
+import { Authenticate } from "../../../services/Authenticate";
+import { ErrorMessage } from "../../../models/error.models";
 
 const Login: React.FC = () => {
   const [ hide, setHide ] = useState(true);
@@ -16,25 +18,18 @@ const Login: React.FC = () => {
   });
 
   async function handleLogin() {
+    if(!data.email) return newWarn("error", "Preencha o campo e-mail");
+    if(!data.password) return newWarn("error", "Preencha o campo senha");
+
     try {
       newWarn("update", "Verificando dados...");
-      console.log(data)
 
-      const req = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: {},
-        body: JSON.stringify({
-          login: data.email,
-          password: data.password
-        })
-      });
+      const req = await Authenticate.login(data.email, data.password);
 
-      if(req.ok !== true) throw await req.json();
-
-      console.log(await req.json());
+      console.log(req)
       newWarn("success", "Deu!");
-    } catch (error: any) {
-      newWarn("error", JSON.stringify(error?.message || error));
+    } catch (error: ErrorMessage | any) {
+      newWarn("error", error?.message || JSON.parse(error));
     }
   }
 

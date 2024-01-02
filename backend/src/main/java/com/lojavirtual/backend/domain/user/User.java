@@ -27,8 +27,9 @@ public class User implements UserDetails {
 
     public User(RegisterDTO data, String encryptedPassword) {
         this.login = data.login();
+        this.name = data.name();
         this.password = encryptedPassword;
-        this.role = data.role();
+        this.role = UserRole.USER;
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
