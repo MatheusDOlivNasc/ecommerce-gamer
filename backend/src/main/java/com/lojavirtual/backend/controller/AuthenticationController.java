@@ -5,14 +5,17 @@ import com.lojavirtual.backend.exceptions.NotFoundException;
 import com.lojavirtual.backend.exceptions.UserAlreadyExistsException;
 import com.lojavirtual.backend.infra.security.TokenService;
 import com.lojavirtual.backend.repositories.UserRepository;
+import com.lojavirtual.backend.services.SendEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -25,6 +28,8 @@ public class AuthenticationController {
 
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private SendEmailService sendEmail;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/login")
@@ -53,5 +58,38 @@ public class AuthenticationController {
         this.repo.save(newUser);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/password-reset")
+    public ResponseEntity<Void> passwordReset(@RequestBody PasswordResetDTO data) {
+        if(this.repo.findByLogin(data.email()) == null) {
+            throw new NotFoundException("Usuário não encontrado");
+        }
+
+        String token = tokenService.generatePasswordResetToken(data.email());
+
+        sendEmail.sendMail(data.email(), token);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/new-password-check")
+    public ResponseEntity<Void> passwordChange(@RequestBody NewPasswordRequestDTO data) {
+        String email = tokenService.validatePasswordToken(data.token());
+
+        UserDetails user = repo.findByLogin(email);
+
+        if(user == null) {
+            throw new NotFoundException("Usuário não encontrado");
+        }
+
+        User update = (User) user;
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        update.setPassword(encryptedPassword);
+
+        repo.save(update);
+
+        return ResponseEntity.ok().build();
     }
 }

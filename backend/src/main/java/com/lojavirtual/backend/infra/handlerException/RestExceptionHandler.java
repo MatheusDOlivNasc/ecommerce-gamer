@@ -1,6 +1,7 @@
 package com.lojavirtual.backend.infra.handlerException;
 
 import com.lojavirtual.backend.exceptions.NotFoundException;
+import com.lojavirtual.backend.exceptions.SendEmailErrorException;
 import com.lojavirtual.backend.exceptions.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     private ResponseEntity<RestErrorMessage> userAlreadyExists(UserAlreadyExistsException exception) {
         RestErrorMessage error = new RestErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return error.toResponse();
+    }
+
+    @ExceptionHandler(SendEmailErrorException.class)
+    private ResponseEntity<RestErrorMessage> emailError(SendEmailErrorException e) {
+        RestErrorMessage error = new RestErrorMessage(HttpStatus.BAD_REQUEST, e.getMessage());
         return error.toResponse();
     }
 

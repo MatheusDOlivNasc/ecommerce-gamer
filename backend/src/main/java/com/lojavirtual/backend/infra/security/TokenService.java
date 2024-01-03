@@ -16,6 +16,8 @@ import java.time.ZoneOffset;
 public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
+    @Value("${api.security.token.passwordResetSecret}")
+    private String passwordResetSecret;
 
     public String generateToken(User user) {
         try {
@@ -24,10 +26,25 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(user.getLogin())
-                    .withExpiresAt(genExpirationDate())
+                    .withExpiresAt(genExpirationDate(24))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("error while generating token", exception);
+        }
+    }
+
+    public String generatePasswordResetToken(String email) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(passwordResetSecret);
+
+            return JWT.create()
+                    .withIssuer("reset-password")
+                    .withSubject(email)
+                    .withIssuedAt(genExpirationDate(0))
+                    .withExpiresAt(genExpirationDate(1))
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("error while generating password reset token", exception);
         }
     }
 
@@ -45,7 +62,21 @@ public class TokenService {
         }
     }
 
-    private Instant genExpirationDate() {
-        return LocalDateTime.now().plusHours(24).toInstant(ZoneOffset.of("-03:00"));
+    public String validatePasswordToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+
+            return JWT.require(algorithm)
+                    .withIssuer("reset-password")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            return "";
+        }
+    }
+
+    private Instant genExpirationDate(Integer n) {
+        return LocalDateTime.now().plusHours(n).toInstant(ZoneOffset.of("-03:00"));
     }
 }
