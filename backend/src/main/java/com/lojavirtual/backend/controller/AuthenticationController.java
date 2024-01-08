@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -40,15 +42,14 @@ public class AuthenticationController {
 
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         Authentication auth = authenticationManager.authenticate(usernamePassword);
+        LoginResponseDTO response = tokenService.generateToken((User) auth.getPrincipal());
 
-        String token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(response);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterDTO data) {
+    public ResponseEntity<LoginResponseDTO> register(@RequestBody RegisterDTO data) {
         if(this.repo.findByLogin(data.login()) != null) {
             throw new UserAlreadyExistsException();
         }
@@ -57,7 +58,13 @@ public class AuthenticationController {
         User newUser = new User(data, encryptedPassword);
         this.repo.save(newUser);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        UserDetails user = this.repo.findByLogin(newUser.getLogin());
+
+
+
+        LoginResponseDTO response = tokenService.generateToken((User) user);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/password-reset")

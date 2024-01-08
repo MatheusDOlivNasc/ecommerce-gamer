@@ -1,5 +1,9 @@
 package com.lojavirtual.backend.domain.user;
 
+import lombok.NonNull;
+
 public record LoginResponseDTO(
-        String token
+        @NonNull String token,
+        @NonNull String name,
+        @NonNull Long validity
 ) {}

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.lojavirtual.backend.domain.user.LoginResponseDTO;
 import com.lojavirtual.backend.domain.user.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,15 +20,17 @@ public class TokenService {
     @Value("${api.security.token.passwordResetSecret}")
     private String passwordResetSecret;
 
-    public String generateToken(User user) {
+    public LoginResponseDTO generateToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-
-            return JWT.create()
+            Instant expiresAt = genExpirationDate(24);
+            String token = JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(user.getLogin())
-                    .withExpiresAt(genExpirationDate(24))
+                    .withExpiresAt(expiresAt)
                     .sign(algorithm);
+
+            return new LoginResponseDTO(token, user.getName(), expiresAt.toEpochMilli());
         } catch (JWTCreationException exception) {
             throw new RuntimeException("error while generating token", exception);
         }
