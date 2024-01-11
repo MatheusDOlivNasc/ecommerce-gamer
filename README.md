@@ -3,7 +3,7 @@ Este é um projeto de E-commerce Gamer desenvolvido por Matheus de Oliveira Nasc
 
 ## Tecnologias Utilizadas
 - Backend: Java Spring;
-- Frontend: React;
+- Frontend: React (Typescript, Tailwind);
 - Banco de Dados: PostgreSQL;
 
 ## Sobre o Projeto
