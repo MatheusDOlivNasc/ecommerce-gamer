@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Icon from "../Icon";
 import { Link } from "react-router-dom";
 import { Cart } from "../../models/cart.models";
-/* import Button from "../Button"; */
+import { AuthContext, AuthContextModel } from "../../contexts/AuthContext";
+import Sales from "../../services/Sales";
 
 interface Props {
   cart: Cart | null;
@@ -14,6 +15,12 @@ const NavBar: React.FC<Props> = ({
 }) => {
   const [show, setShow] = useState(false);
   const [on, setOn] = useState(false);
+  const [{ error, update, success }, setWarn] = useState({
+    error: "",
+    update: "",
+    success: "",
+  });
+  const { user, logout } = useContext(AuthContext) as AuthContextModel;
 
   function handleRemoveItem(id: string) {
     if (!cart) return;
@@ -22,29 +29,26 @@ const NavBar: React.FC<Props> = ({
   }
   async function handleFinish() {
     try {
-      if (!cart) return;
-      console.log(cart.toData())
-      const req = await fetch("http://localhost:8080/cart", {
-        method: "POST",
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(cart.toData())
-      })
+      newWarn("update", "Verificando dados");
 
-      if(req.ok !== true) throw await req.json();
+      if (!cart) throw { message: "Ocorreu um erro ao gerar seu carrinho" };
 
-      console.log("deu")
-    } catch (error) {
-      console.log(error)
+      await Sales.newSale(cart)
+
+      newWarn("success", "Pedido finalizado");
+    } catch (error: any) {
+      newWarn("error", error?.message || "Ocorreu um erro");
     }
   }
   function updateShow() {
+    newWarn();
     let r = !show;
     const time = 100;
-    
-    if(r === true) {
+
+    if (r === true) {
       setOn(r);
       setTimeout(() => {
-        
+
         setShow(r);
       }, time)
     } else {
@@ -53,7 +57,24 @@ const NavBar: React.FC<Props> = ({
         setOn(r);
       }, time)
     }
-    
+
+    if(success) handleCloseCart();
+  }
+  function handleCloseCart() {
+    reload(new Cart({
+      id: "",
+      owner: user || "",
+      createAt: Date.now(),
+      products: []
+    }));
+  }
+
+  function newWarn(command?: "error" | "update" | "success", message: string = "") {
+    setWarn({
+      error: (command === "error" ? message : ""),
+      update: (command === "update" ? message : ""),
+      success: (command === "success" ? message : ""),
+    })
   }
 
   return (
@@ -63,16 +84,36 @@ const NavBar: React.FC<Props> = ({
       </Link>
       <nav className="flex-none">
         <ul className="flex flex-center h-full text-white">
-          <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
-            <Link
-              className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
-              to="/auth/login">Entrar</Link>
-          </li>
-          <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
-            <Link
-              className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
-              to="/auth/register">Registrar</Link>
-          </li>
+          {
+            !user && (
+              <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
+                <Link
+                  className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
+                  to="/auth/login">Entrar</Link>
+              </li>
+            )
+          }
+          {
+            !user && (
+              <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
+                <Link
+                  className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
+                  to="/auth/register">Registrar</Link>
+              </li>
+            )
+          }
+          {
+            user && (
+              <li className="justify-center items-center pr-1 hidden sm:flex max-w-52 h-full">
+                <button
+                  className="flex h-full w-full justify-center items-center gap-x-1.5 px-3 py-2 rounded-tr-lg rounded-tl-lg text-sm font-semibold shadow-sm ring-inset text-white lg:hover:bg-gray-800 lg:group-hover/cart:bg-gray-800 border-b-4 border-white/0 lg:hover:border-white lg:group-hover/cart:border-white transition-all ease-in-out duration-300"
+                  onClick={() => logout()}>
+                  Sair
+                </button>
+              </li>
+            )
+          }
+
           <li className="relative inline-block text-left group/cart">
             <div className="flex justify-center align-middle h-full ">
               <button
@@ -98,23 +139,23 @@ const NavBar: React.FC<Props> = ({
                 className={
                   `fixed inset-0 bg-gray-700
                   ${show ? "bg-opacity-70" : "bg-opacity-0"} transition ease-in-out delay-100`}
-                  />
+              />
 
               <div className="fixed inset-0 overflow-hidden">
                 <div
                   id="screen"
                   onClick={s => {
                     const c = s.target as HTMLDivElement;
-                    if(c.id === "screen") updateShow();
+                    if (c.id === "screen") updateShow();
                   }}
                   className="absolute inset-0 overflow-hidden" >
                   <div className={
-                      `pointer-events-none fixed inset-y-0 flex max-w-full pl-10
-                      transition-right ease-in-out duration-500 ${show && "right-0" || "right-100" }`
-                    }>
+                    `pointer-events-none fixed inset-y-0 flex max-w-full pl-10
+                      transition-right ease-in-out duration-500 ${show && "right-0" || "right-100"}`
+                  }>
                     <div className="pointer-events-auto w-screen max-w-md">
-                      <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
-                        <div className="flex-1 px-4 py-6 sm:px-6">
+                      <div className="flex h-full flex-col overflow-y-hidden bg-white shadow-xl">
+                        <div className="px-4 pt-6 pb-1 sm:px-6">
                           <div className="flex items-start justify-between">
                             <h2 className="text-lg font-medium text-gray-900" id="slide-over-title">Carrinho</h2>
                             <div className="ml-3 flex h-7 items-center">
@@ -127,14 +168,16 @@ const NavBar: React.FC<Props> = ({
                               </button>
                             </div>
                           </div>
+                        </div>
 
+                        <div className="flex-1 h-1 px-4 py-0 sm:px-6 overflow-auto">
                           <div className="mt-8">
                             <div className="flow-root">
                               <ul role="list" className="-my-6 divide-y divide-gray-200">
 
                                 {
                                   cart?.getProducts()?.map(prod => (
-                                    <li className="flex py-6">
+                                    <li key={prod.getId() || crypto.randomUUID()} className="flex py-6">
                                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                         <img
                                           src={prod.getImg()}
@@ -181,11 +224,24 @@ const NavBar: React.FC<Props> = ({
                             Frete e taxas serão calculadas no pagamento.
                           </p>
                           <div className="mt-6">
-                            <button 
+                            {
+                              error ? <div className="py-2 px-3 mt-2 bg-red-200 rounded text-black text-center">{error}</div> :
+                                update ? <div className="py-2 px-3 mt-2 bg-gray-100 rounded text-black text-center">{update}</div> :
+                                  success ? <div className="py-2 px-3 mt-2 bg-gray-100 rounded text-black text-center">{success}</div>
+                                    : null
+                            }
+                            <button
                               type="button"
-                              onClick={handleFinish}
-                              className="flex items-center w-full justify-center rounded-md border border-transparent bg-purple-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-purple-700">
-                              Finalizar compra
+                              disabled={!cart || cart.getProducts().length == 0}
+                              onClick={
+                                success ? updateShow :
+                                handleFinish
+                              }
+                              className="flex items-center w-full justify-center rounded-md border border-transparent bg-purple-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-purple-700 disabled:opacity-30 transition-all ease-in-out duration-300 delay-150">
+                              {
+                                success ? "Fechar" :
+                                "Finalizar compra"
+                              }
                             </button>
                           </div>
                           <div className="mt-6 flex justify-center text-center text-sm text-gray-500">

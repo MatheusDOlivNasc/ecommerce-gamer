@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "../../../components/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { Authenticate } from "../../../services/Authenticate";
 import { ErrorMessage } from "../../../models/error.models";
+import { AuthContext, AuthContextModel } from "../../../contexts/AuthContext";
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [ hide, setHide ] = useState(true);
   const [ {error, update, success}, setWarn ] = useState({
     error: "",
     update: "",
     success: ""
   });
+  const { setUser } = useContext(AuthContext) as AuthContextModel;
   const [ data, setData ] = useState({
     email: "",
     password: ""
@@ -26,8 +29,12 @@ const Login: React.FC = () => {
 
       const req = await Authenticate.login(data.email, data.password);
 
-      console.log(req)
-      newWarn("success", "Deu!");
+      setUser(req);
+      newWarn("success", "Concluido");
+      
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     } catch (error: ErrorMessage | any) {
       newWarn("error", error?.message || JSON.parse(error));
     }

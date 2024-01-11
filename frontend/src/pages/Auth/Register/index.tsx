@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "../../../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon";
 import { Authenticate } from "../../../services/Authenticate";
 import { ErrorMessage } from "../../../models/error.models";
+import { AuthContext, AuthContextModel } from "../../../contexts/AuthContext";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Register: React.FC = () => {
     email: "",
     password: "",
   });
+  const { setUser } = useContext(AuthContext) as AuthContextModel;
 
   async function handleRegister() {
     if(!data.name) return newWarn("error", 'Preencha o campo: "Nome"');
@@ -26,12 +28,13 @@ const Register: React.FC = () => {
     newWarn("update", "Verificando dados");
 
     try {
-      await Authenticate.register(data.email, data.password, data.name);
+      const res = await Authenticate.register(data.email, data.password, data.name);
 
+      setUser(res);
       newWarn("success", "Cadastrado com sucesso");
       
       setTimeout(() => {
-        navigate("/auth/login");
+        navigate("/");
       }, 1000);
     } catch (error: ErrorMessage | any) {
       newWarn("error", error?.message || JSON.parse(error));

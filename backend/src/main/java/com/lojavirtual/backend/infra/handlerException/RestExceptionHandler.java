@@ -29,9 +29,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return error.toResponse();
     }
 
-    //@ExceptionHandler(Exception.class)
-    //private ResponseEntity<RestErrorMessage> errorException(Exception exception) {
-    //    RestErrorMessage error = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-    //    return error.toResponse();
-    //}
+    @ExceptionHandler(Exception.class)
+    private ResponseEntity<RestErrorMessage> errorException(Exception exception) {
+        RestErrorMessage error = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        return error.toResponse();
+    }
 }

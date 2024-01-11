@@ -18,7 +18,7 @@ public class SendEmailService {
             message.setFrom("matheus.o.nascimento@outlook.com");
             message.setTo(email);
             message.setSubject("Redefina sua senha - ACOMP Eletronicos");
-            message.setText("Acesse o link para redefinir: http://localhost:5137/reset-password/" + token);
+            message.setText("Acesse o link para redefinir: http://localhost:5137/auth/reset-password/" + token);
             emailSender.send(message);
         } catch (MailException e) {
             throw new SendEmailErrorException();

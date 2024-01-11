@@ -4,6 +4,8 @@ import Auth from './pages/Auth';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgetPassword from './pages/Auth/ForgetPassword';
+import PasswordReset from './pages/Auth/PasswordReset';
+import { AuthProvider } from './contexts/AuthContext';
 
 const Router = createBrowserRouter([
   {
@@ -17,16 +19,18 @@ const Router = createBrowserRouter([
           {path: "/auth/login", element: <Login />},
           {path: "/auth/register", element: <Register />},
           {path: "/auth/forgetpassword", element: <ForgetPassword />},
+          {path: "/auth/reset-password/:token", element: <PasswordReset />},
         ]
       }
     ]
-  },
-  
+  }
 ])
 
 function App() {
   return (
-    <RouterProvider router={Router} />
+    <AuthProvider>
+      <RouterProvider router={Router} />
+    </AuthProvider>
   );
 };
 

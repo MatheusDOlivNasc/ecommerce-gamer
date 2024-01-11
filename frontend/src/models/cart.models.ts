@@ -87,4 +87,7 @@ export class Cart implements CartModel {
     this.products = p;
     this.setProductsData(p);
   }
+  setOwner(user: string) {
+    this.owner = user;
+  }
 }

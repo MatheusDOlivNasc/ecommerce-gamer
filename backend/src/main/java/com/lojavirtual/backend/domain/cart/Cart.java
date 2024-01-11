@@ -31,8 +31,8 @@ public class Cart {
     )
     private List<Product> products;
 
-    public Cart(CartRequestDTO data, List<Product> products) {
-        this.owner = data.owner();
+    public Cart(CartRequestDTO data, List<Product> products, String owner) {
+        this.owner = owner;
         this.createAt = new Timestamp(data.createAt());
         this.products = products;
     }
